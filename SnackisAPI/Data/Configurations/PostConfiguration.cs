@@ -9,7 +9,7 @@ public class PostConfiguration : IEntityTypeConfiguration<Post>
     public void Configure(EntityTypeBuilder<Post> builder)
     {
         builder.Property(post => post.Title).HasMaxLength(150);
-        builder.Property(post => post.Content).HasMaxLength(5000);
+        builder.Property(post => post.Content).HasMaxLength(4000);
 
         builder.HasOne(post => post.User).WithMany()
             .HasForeignKey(post => post.UserId)
