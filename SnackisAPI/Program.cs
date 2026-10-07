@@ -18,8 +18,8 @@ public class Program
 
         builder.Services.AddIdentityCore<User>()
             .AddRoles<IdentityRole>()
-            .AddEntityFrameworkStores<SnackisDbContext>()
-            .AddDefaultTokenProviders();
+            .AddEntityFrameworkStores<SnackisDbContext>();
+
 
 
         // Add services to the container.
