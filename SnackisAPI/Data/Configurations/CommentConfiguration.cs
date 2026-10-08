@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using SnackisAPI.Helpers;
 using SnackisAPI.Models;
 
 namespace SnackisAPI.Data.Configurations;
@@ -8,7 +9,7 @@ public class CommentConfiguration : IEntityTypeConfiguration<Comment>
 {
     public void Configure(EntityTypeBuilder<Comment> builder)
     {
-        builder.Property(comment => comment.Content).HasMaxLength(2000);
+        builder.Property(comment => comment.Content).HasMaxLength(FieldLengths.CommentContent);
 
         builder.HasOne(comment => comment.User).WithMany()
             .HasForeignKey(comment => comment.UserId)

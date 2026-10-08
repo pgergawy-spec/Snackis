@@ -11,12 +11,18 @@ public class PrivateMessageRepository : GenericRepository<PrivateMessage>, IPriv
 
     }
     public async Task<IEnumerable<PrivateMessage>> GetInboxAsync(string userId)
-    => await _dbSet.Where(message => message.ReceiverUserId == userId)
-        .Include(message => message.Sender)
-        .OrderByDescending(message => message.Date).ToListAsync();
+        => await _dbSet.AsNoTracking()
+            .Where(message => message.ReceiverUserId == userId)
+            .Include(message => message.Sender)
+            .Include(message => message.Receiver)
+            .OrderByDescending(message => message.Date)
+            .ToListAsync();
 
     public async Task<IEnumerable<PrivateMessage>> GetSentAsync(string userId)
-        => await _dbSet.Where(message => message.SenderUserId == userId)
+        => await _dbSet.AsNoTracking()
+            .Where(message => message.SenderUserId == userId)
+            .Include(message => message.Sender)
             .Include(message => message.Receiver)
-            .OrderByDescending(message => message.Date).ToListAsync();
+            .OrderByDescending(message => message.Date)
+            .ToListAsync();
 }
