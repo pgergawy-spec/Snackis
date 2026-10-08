@@ -9,8 +9,8 @@ public class TopicConfiguration : IEntityTypeConfiguration<Topic>
     public void Configure(EntityTypeBuilder<Topic> builder)
     {
         builder.Property(topic => topic.Name).HasMaxLength(100);
-        builder.Property(topic => topic.Slug).HasMaxLength(100);
-        builder.HasIndex(topic => topic.Slug).IsUnique();
+        builder.Property(topic => topic.UrlName).HasMaxLength(100);
+        builder.HasIndex(topic => topic.UrlName).IsUnique();
 
         builder.HasOne(topic => topic.Parent).WithMany()
             .HasForeignKey(topic => topic.ParentId)

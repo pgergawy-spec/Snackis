@@ -11,8 +11,8 @@ public class TopicRepository : GenericRepository<Topic>, ITopicRepository
 
     }
 
-    public async Task<Topic?> GetBySlugAsync(string slug)
-        => await _dbSet.FirstOrDefaultAsync(topic => topic.Slug == slug);
+    public async Task<Topic?> GetByUrlNameAsync(string urlName)
+        => await _dbSet.FirstOrDefaultAsync(topic => topic.UrlName == urlName);
 
     public async Task<IEnumerable<Topic>> GetMainTopicsAsync()
         => await _dbSet

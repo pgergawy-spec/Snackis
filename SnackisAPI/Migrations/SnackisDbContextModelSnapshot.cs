@@ -298,7 +298,7 @@ namespace SnackisAPI.Migrations
                     b.Property<Guid?>("ParentId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Slug")
+                    b.Property<string>("UrlName")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
@@ -307,7 +307,7 @@ namespace SnackisAPI.Migrations
 
                     b.HasIndex("ParentId");
 
-                    b.HasIndex("Slug")
+                    b.HasIndex("UrlName")
                         .IsUnique();
 
                     b.ToTable("Topics");
