@@ -2,8 +2,8 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using SnackisAPI.Data;
+using SnackisAPI.Exceptions;
 using SnackisAPI.Models;
-
 namespace SnackisAPI;
 
 public class Program
@@ -21,23 +21,22 @@ public class Program
             .AddEntityFrameworkStores<SnackisDbContext>();
 
 
-
-        // Add services to the container.
-
         builder.Services.AddControllers();
-        // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+        builder.Services.AddExceptionHandler<ExceptionHandler>();
+        builder.Services.AddProblemDetails();
+
         builder.Services.AddOpenApi();
 
         var app = builder.Build();
 
-        // Configure the HTTP request pipeline.
+
         if (app.Environment.IsDevelopment())
         {
             app.MapOpenApi();
         }
 
         app.UseHttpsRedirection();
-
+        app.UseExceptionHandler();
         app.UseAuthorization();
 
 
