@@ -13,7 +13,7 @@ public class PostService(IPostRepository postRepository, ITopicRepository topicR
         var topic = await topicRepository.GetByUrlNameAsync(topicUrlName)
             ?? throw new NotFoundException("Ämnet finns inte.");
 
-        return (await postRepository.GetByTopicAsync(topic.Id)).ToDtos();
+        return EntityMappings.ToDtos(await postRepository.GetByTopicAsync(topic.Id));
     }
 
     public async Task<PostDetailsDto> GetDetailsAsync(Guid id)
@@ -21,7 +21,7 @@ public class PostService(IPostRepository postRepository, ITopicRepository topicR
         var post = await postRepository.GetByIdWithDetailsAsync(id)
             ?? throw new NotFoundException("Inlägget finns inte.");
 
-        return post.ToDetailsDto();
+        return EntityMappings.ToDetailsDto(post);
     }
 
     public async Task<PostDetailsDto> CreateAsync(CreatePostDto createPostDto, string userId)
@@ -32,7 +32,7 @@ public class PostService(IPostRepository postRepository, ITopicRepository topicR
         if (topic.ParentId == null)
             throw new BadRequestException("Inlägg kan bara skapas i ett underämne.");
 
-        var post = createPostDto.ToEntity(userId);
+        var post = EntityMappings.ToEntity(createPostDto, userId);
         await postRepository.AddAsync(post);
         logger.LogInformation("Post {PostId} created by user {UserId} in topic {TopicId}", post.Id, userId, topic.Id);
 

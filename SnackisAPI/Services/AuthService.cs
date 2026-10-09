@@ -6,7 +6,7 @@ using SnackisAPI.Models;
 
 namespace SnackisAPI.Services;
 
-public class AuthService(UserManager<User> userManager, ILogger<AuthService> logger) : IAuthService
+public class AuthService(UserManager<User> userManager, ITokenService tokenService, ILogger<AuthService> logger) : IAuthService
 {
     private const string DefaultRoleName = "User";
 
@@ -28,7 +28,7 @@ public class AuthService(UserManager<User> userManager, ILogger<AuthService> log
         return await ToUserDtoAsync(user);
     }
 
-    public async Task<UserDto> LoginAsync(LoginDto loginDto)
+    public async Task<AuthResultDto> LoginAsync(LoginDto loginDto)
     {
         var user = await userManager.FindByNameAsync(loginDto.UserName);
         var isPasswordCorrect = user is not null && await userManager.CheckPasswordAsync(user, loginDto.Password);
@@ -39,7 +39,8 @@ public class AuthService(UserManager<User> userManager, ILogger<AuthService> log
             throw new UnauthorizedException("Fel användarnamn eller lösenord.");
         }
 
-        return await ToUserDtoAsync(user);
+        logger.LogInformation("User {UserId} logged in", user.Id);
+        return tokenService.CreateToken(await ToUserDtoAsync(user));
     }
 
     public async Task<UserDto> GetUserAsync(string userId)
@@ -51,7 +52,7 @@ public class AuthService(UserManager<User> userManager, ILogger<AuthService> log
     }
 
     private async Task<UserDto> ToUserDtoAsync(User user)
-        => user.ToDto(await userManager.GetRolesAsync(user));
+        => EntityMappings.ToDto(user, await userManager.GetRolesAsync(user));
 
     private static ApiException CreateRegistrationException(IdentityResult creationResult)
     {

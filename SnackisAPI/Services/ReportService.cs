@@ -9,23 +9,23 @@ public class ReportService(IReportRepository reportRepository, IPostRepository p
 {
     public async Task<ReportDto> CreateAsync(CreateReportDto createReportDto, string userId)
     {
-        await postRepository.EnsureExistsAsync(createReportDto.PostId);
+        await PostRepositoryChecks.EnsureExistsAsync(postRepository, createReportDto.PostId);
 
         if (await reportRepository.HasUserReportedPostAsync(createReportDto.PostId, userId))
             throw new ConflictException("Du har redan anmält det här inlägget.");
 
-        var report = createReportDto.ToEntity(userId);
+        var report = EntityMappings.ToEntity(createReportDto, userId);
         await reportRepository.AddAsync(report);
         logger.LogInformation("Report {ReportId} created by user {UserId} on post {PostId}", report.Id, userId, report.PostId);
 
         var createdReport = await reportRepository.GetByIdWithDetailsAsync(report.Id)
             ?? throw new NotFoundException("Anmälan finns inte.");
 
-        return createdReport.ToDto();
+        return EntityMappings.ToDto(createdReport);
     }
 
     public async Task<IEnumerable<ReportDto>> GetUnreviewedAsync()
-        => (await reportRepository.GetUnreviewedAsync()).ToDtos();
+        => EntityMappings.ToDtos(await reportRepository.GetUnreviewedAsync());
 
     public async Task MarkAsReviewedAsync(Guid id)
     {

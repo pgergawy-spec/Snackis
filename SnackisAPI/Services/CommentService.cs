@@ -10,23 +10,23 @@ public class CommentService(ICommentRepository commentRepository, IPostRepositor
 {
     public async Task<IEnumerable<CommentDto>> GetByPostAsync(Guid postId)
     {
-        await postRepository.EnsureExistsAsync(postId);
+        await PostRepositoryChecks.EnsureExistsAsync(postRepository, postId);
 
-        return (await commentRepository.GetByPostAsync(postId)).ToDtos();
+        return EntityMappings.ToDtos(await commentRepository.GetByPostAsync(postId));
     }
 
     public async Task<CommentDto> CreateAsync(CreateCommentDto createCommentDto, string userId)
     {
-        await postRepository.EnsureExistsAsync(createCommentDto.PostId);
+        await PostRepositoryChecks.EnsureExistsAsync(postRepository, createCommentDto.PostId);
 
-        var comment = createCommentDto.ToEntity(userId);
+        var comment = EntityMappings.ToEntity(createCommentDto, userId);
         await commentRepository.AddAsync(comment);
         logger.LogInformation("Comment {CommentId} created by user {UserId} on post {PostId}", comment.Id, userId, comment.PostId);
 
         var createdComment = await commentRepository.GetByIdWithAuthorAsync(comment.Id)
             ?? throw new NotFoundException("Kommentaren finns inte.");
 
-        return createdComment.ToDto();
+        return EntityMappings.ToDto(createdComment);
     }
 
     public async Task DeleteAsync(Guid id, string userId, bool isAdmin)

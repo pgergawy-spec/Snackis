@@ -361,3 +361,7 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+# Uppladdade profilbilder (checkas inte in, bara mappen)
+SnackisAPI/wwwroot/uploads/profile-pictures/*
+!SnackisAPI/wwwroot/uploads/profile-pictures/.gitkeep
