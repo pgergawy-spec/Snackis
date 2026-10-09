@@ -1,9 +1,4 @@
-﻿namespace SnackisAPI.Exceptions;
+namespace SnackisAPI.Exceptions;
 
-public class NotFoundException : Exception
-{
-    public NotFoundException(string message) : base(message)
-    {
-
-    }
-}
+public class NotFoundException(string message)
+    : ApiException(message, StatusCodes.Status404NotFound, "Hittades inte");

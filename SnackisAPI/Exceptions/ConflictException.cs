@@ -1,9 +1,4 @@
-﻿namespace SnackisAPI.Exceptions;
+namespace SnackisAPI.Exceptions;
 
-public class ConflictException : Exception
-{
-    public ConflictException(string message) : base(message)
-    {
-
-    }
-}
+public class ConflictException(string message)
+    : ApiException(message, StatusCodes.Status409Conflict, "Finns redan");

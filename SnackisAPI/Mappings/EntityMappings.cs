@@ -21,6 +21,30 @@ public static class EntityMappings
         ParentId = dto.ParentId
     };
 
+    public static TopicDto ToDto(this Topic topic, IEnumerable<Topic> subTopics)
+    {
+        var topicDto = topic.ToDto();
+        topicDto.SubTopics = subTopics
+            .OrderBy(subTopic => subTopic.Name)
+            .Select(subTopic => subTopic.ToDto())
+            .ToList();
+        return topicDto;
+    }
+
+    public static List<TopicDto> ToTopicOverview(this IEnumerable<Topic> topics)
+    {
+        var allTopics = topics.ToList();
+        var subTopicsByParentId = allTopics
+            .Where(topic => topic.ParentId != null)
+            .ToLookup(topic => topic.ParentId!.Value);
+
+        return allTopics
+            .Where(topic => topic.ParentId == null)
+            .OrderBy(mainTopic => mainTopic.Name)
+            .Select(mainTopic => mainTopic.ToDto(subTopicsByParentId[mainTopic.Id]))
+            .ToList();
+    }
+
     public static PostDto ToDto(this Post post) => MapPost<PostDto>(post);
 
     public static PostDetailsDto ToDetailsDto(this Post post)
@@ -102,6 +126,18 @@ public static class EntityMappings
         IsReviewed = false,
         Date = DateTime.UtcNow
     };
+
+    public static List<PostDto> ToDtos(this IEnumerable<Post> posts)
+        => posts.Select(post => post.ToDto()).ToList();
+
+    public static List<CommentDto> ToDtos(this IEnumerable<Comment> comments)
+        => comments.Select(comment => comment.ToDto()).ToList();
+
+    public static List<PrivateMessageDto> ToDtos(this IEnumerable<PrivateMessage> messages)
+        => messages.Select(message => message.ToDto()).ToList();
+
+    public static List<ReportDto> ToDtos(this IEnumerable<Report> reports)
+        => reports.Select(report => report.ToDto()).ToList();
 
     public static UserDto ToDto(this User user, IEnumerable<string> roles) => new()
     {

@@ -14,10 +14,6 @@ public class TopicRepository : GenericRepository<Topic>, ITopicRepository
     public async Task<Topic?> GetByUrlNameAsync(string urlName)
         => await _dbSet.FirstOrDefaultAsync(topic => topic.UrlName == urlName);
 
-    public async Task<IEnumerable<Topic>> GetMainTopicsAsync()
-        => await _dbSet
-        .Where(topic => topic.ParentId == null).ToListAsync();
-
     public async Task<IEnumerable<Topic>> GetSubTopicsAsync(Guid parentId)
         => await _dbSet.Where(topic => topic.ParentId == parentId).ToListAsync();
 }

@@ -16,6 +16,11 @@ public class SnackisDbContext : IdentityDbContext<User>
     public DbSet<Report> Reports { get; set; }
     public DbSet<Topic> Topics { get; set; }
 
+    protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+    {
+        configurationBuilder.Properties<DateTime>().HaveConversion<UtcDateTimeConverter>();
+    }
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);

@@ -1,9 +1,4 @@
-﻿namespace SnackisAPI.Exceptions;
+namespace SnackisAPI.Exceptions;
 
-public class BadRequestException : Exception
-{
-    public BadRequestException(string message) : base(message)
-    {
-
-    }
-}
+public class BadRequestException(string message)
+    : ApiException(message, StatusCodes.Status400BadRequest, "Ogiltig begäran");

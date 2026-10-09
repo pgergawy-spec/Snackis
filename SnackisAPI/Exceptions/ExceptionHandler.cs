@@ -1,40 +1,30 @@
-﻿using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 
 namespace SnackisAPI.Exceptions;
 
-public class ExceptionHandler : IExceptionHandler
+public class ExceptionHandler(ILogger<ExceptionHandler> logger) : IExceptionHandler
 {
-    private readonly ILogger<ExceptionHandler> _logger;
-
-    public ExceptionHandler(ILogger<ExceptionHandler> logger)
-    {
-        _logger = logger;
-    }
-
     public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
     {
-        var (statusCode, errorTitle) = exception switch
+        var (statusCode, errorTitle, errorDetail) = exception switch
         {
-            NotFoundException => (StatusCodes.Status404NotFound, "Hittades inte"),
-            ConflictException => (StatusCodes.Status409Conflict, "Finns redan"),
-            BadRequestException => (StatusCodes.Status400BadRequest, "Ogiltig begäran"),
-            Exception => (StatusCodes.Status500InternalServerError, "Något gick fel")
+            ApiException apiException => (apiException.StatusCode, apiException.Title, exception.Message),
+            BadHttpRequestException badRequestException => (badRequestException.StatusCode, "Ogiltig begäran", "Förfrågan har fel format."),
+            Exception => (StatusCodes.Status500InternalServerError, "Något gick fel", (string?)null)
         };
 
-        var isUnexpectedError = statusCode == StatusCodes.Status500InternalServerError;
-
-        if (isUnexpectedError)
-            _logger.LogError(exception, "Unexpected error in {Path}", httpContext.Request.Path);
+        if (statusCode == StatusCodes.Status500InternalServerError)
+            logger.LogError(exception, "Unexpected error in {Path}", httpContext.Request.Path);
         else
-            _logger.LogWarning("{ErrorTitle}: {ErrorMessage}", errorTitle, exception.Message);
+            logger.LogWarning("{ErrorTitle}: {ErrorMessage}", errorTitle, exception.Message);
 
         httpContext.Response.StatusCode = statusCode;
         await httpContext.Response.WriteAsJsonAsync(new ProblemDetails
         {
             Status = statusCode,
             Title = errorTitle,
-            Detail = isUnexpectedError ? null : exception.Message
+            Detail = errorDetail
         }, cancellationToken);
 
         return true;

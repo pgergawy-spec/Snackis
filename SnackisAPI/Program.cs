@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using SnackisAPI.Data;
 using SnackisAPI.Exceptions;
+using SnackisAPI.Extensions;
 using SnackisAPI.Models;
 namespace SnackisAPI;
 
@@ -16,10 +17,12 @@ public class Program
         var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
         builder.Services.AddDbContext<SnackisDbContext>(options => options.UseSqlServer(connectionString));
 
-        builder.Services.AddIdentityCore<User>()
+        builder.Services.AddIdentityCore<User>(options => options.User.RequireUniqueEmail = true)
             .AddRoles<IdentityRole>()
             .AddEntityFrameworkStores<SnackisDbContext>();
 
+
+        builder.Services.AddRepositories().AddServices();
 
         builder.Services.AddControllers();
         builder.Services.AddExceptionHandler<ExceptionHandler>();
