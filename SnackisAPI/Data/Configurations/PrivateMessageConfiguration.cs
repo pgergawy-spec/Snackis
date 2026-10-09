@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using SnackisAPI.Helpers;
 using SnackisAPI.Models;
 
 namespace SnackisAPI.Data.Configurations;
@@ -8,7 +9,7 @@ public class PrivateMessageConfiguration : IEntityTypeConfiguration<PrivateMessa
 {
     public void Configure(EntityTypeBuilder<PrivateMessage> builder)
     {
-        builder.Property(message => message.Content).HasMaxLength(2000);
+        builder.Property(message => message.Content).HasMaxLength(FieldLengths.MessageContent);
 
         builder.HasOne(message => message.Sender).WithMany()
             .HasForeignKey(message => message.SenderUserId)
