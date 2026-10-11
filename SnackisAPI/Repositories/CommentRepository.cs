@@ -4,11 +4,8 @@ using SnackisAPI.Models;
 
 namespace SnackisAPI.Repositories;
 
-public class CommentRepository : GenericRepository<Comment>, ICommentRepository
+public class CommentRepository(SnackisDbContext context) : GenericRepository<Comment>(context), ICommentRepository
 {
-    public CommentRepository(SnackisDbContext context) : base(context)
-    {
-    }
 
     public async Task<IEnumerable<Comment>> GetByPostAsync(Guid postId)
         => await _dbSet.AsNoTracking()

@@ -4,11 +4,8 @@ using SnackisAPI.Models;
 
 namespace SnackisAPI.Repositories;
 
-public class ReportRepository : GenericRepository<Report>, IReportRepository
+public class ReportRepository(SnackisDbContext context) : GenericRepository<Report>(context), IReportRepository
 {
-    public ReportRepository(SnackisDbContext context) : base(context)
-    {
-    }
 
     public async Task<IEnumerable<Report>> GetUnreviewedAsync()
         => await ReportsWithDetails()

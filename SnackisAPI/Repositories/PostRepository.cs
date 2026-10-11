@@ -4,12 +4,8 @@ using SnackisAPI.Models;
 
 namespace SnackisAPI.Repositories;
 
-public class PostRepository : GenericRepository<Post>, IPostRepository
+public class PostRepository(SnackisDbContext context) : GenericRepository<Post>(context), IPostRepository
 {
-    public PostRepository(SnackisDbContext context) : base(context)
-    {
-
-    }
     public async Task<IEnumerable<Post>> GetByTopicAsync(Guid topicId)
     => await _dbSet.AsNoTracking()
         .Where(post => post.TopicId == topicId)
