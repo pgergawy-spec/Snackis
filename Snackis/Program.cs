@@ -1,3 +1,9 @@
+using Microsoft.AspNetCore.Mvc;
+using Snackis.Filters;
+using Snackis.Services;
+using Snackis.Settings;
+using Snackis.Startup;
+
 namespace Snackis;
 
 public class Program
@@ -6,13 +12,24 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
-
-        builder.Services.AddControllersWithViews();
+        builder.Services.AddControllersWithViews(options =>
+        {
+            options.Filters.Add<ApiExceptionFilter>();
+            options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
+        });
 
         var apiBaseUrl = builder.Configuration["Api:BaseUrl"]
             ?? throw new Exception("Api:BaseUrl saknas i konfigurationen");
 
-        builder.Services.AddHttpClient("SnackisAPI", client => { client.BaseAddress = new Uri(apiBaseUrl); });
+        builder.Services.Configure<ApiSettings>(builder.Configuration.GetSection(ApiSettings.SectionName));
+
+        builder.Services.AddHttpClient(ApiServiceBase.HttpClientName, client =>
+        {
+            client.BaseAddress = new Uri(apiBaseUrl);
+            client.Timeout = TimeSpan.FromSeconds(15);
+        });
+
+        ServiceRegistration.AddApiServices(builder.Services);
 
         var app = builder.Build();
 
@@ -23,6 +40,7 @@ public class Program
         }
 
         app.UseHttpsRedirection();
+        app.UseStatusCodePagesWithReExecute("/Home/Error", "?statusCode={0}");
         app.UseRouting();
 
         app.UseAuthorization();
