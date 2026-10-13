@@ -4,12 +4,8 @@ using SnackisAPI.Models;
 
 namespace SnackisAPI.Repositories;
 
-public class TopicRepository : GenericRepository<Topic>, ITopicRepository
+public class TopicRepository(SnackisDbContext context) : GenericRepository<Topic>(context), ITopicRepository
 {
-    public TopicRepository(SnackisDbContext context) : base(context)
-    {
-
-    }
 
     public async Task<Topic?> GetByUrlNameAsync(string urlName)
         => await _dbSet.FirstOrDefaultAsync(topic => topic.UrlName == urlName);

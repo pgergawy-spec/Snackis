@@ -6,7 +6,7 @@ namespace SnackisAPI.Mappings;
 
 public static class EntityMappings
 {
-    public static TopicDto ToDto(this Topic topic) => new()
+    public static TopicDto ToDto(Topic topic) => new()
     {
         Id = topic.Id,
         Name = topic.Name,
@@ -14,24 +14,24 @@ public static class EntityMappings
         ParentId = topic.ParentId
     };
 
-    public static Topic ToEntity(this CreateTopicDto dto) => new()
+    public static Topic ToEntity(CreateTopicDto dto) => new()
     {
         Name = dto.Name.Trim(),
-        UrlName = dto.Name.ToCleanUrl(),
+        UrlName = UrlFormatter.ToCleanUrl(dto.Name),
         ParentId = dto.ParentId
     };
 
-    public static TopicDto ToDto(this Topic topic, IEnumerable<Topic> subTopics)
+    public static TopicDto ToDto(Topic topic, IEnumerable<Topic> subTopics)
     {
-        var topicDto = topic.ToDto();
+        var topicDto = ToDto(topic);
         topicDto.SubTopics = subTopics
             .OrderBy(subTopic => subTopic.Name)
-            .Select(subTopic => subTopic.ToDto())
+            .Select(subTopic => ToDto(subTopic))
             .ToList();
         return topicDto;
     }
 
-    public static List<TopicDto> ToTopicOverview(this IEnumerable<Topic> topics)
+    public static List<TopicDto> ToTopicOverview(IEnumerable<Topic> topics)
     {
         var allTopics = topics.ToList();
         var subTopicsByParentId = allTopics
@@ -41,13 +41,13 @@ public static class EntityMappings
         return allTopics
             .Where(topic => topic.ParentId == null)
             .OrderBy(mainTopic => mainTopic.Name)
-            .Select(mainTopic => mainTopic.ToDto(subTopicsByParentId[mainTopic.Id]))
+            .Select(mainTopic => ToDto(mainTopic, subTopicsByParentId[mainTopic.Id]))
             .ToList();
     }
 
-    public static PostDto ToDto(this Post post) => MapPost<PostDto>(post);
+    public static PostDto ToDto(Post post) => MapPost<PostDto>(post);
 
-    public static PostDetailsDto ToDetailsDto(this Post post)
+    public static PostDetailsDto ToDetailsDto(Post post)
     {
         var dto = MapPost<PostDetailsDto>(post);
         dto.TopicName = post.Topic?.Name ?? "";
@@ -57,7 +57,7 @@ public static class EntityMappings
         return dto;
     }
 
-    public static Post ToEntity(this CreatePostDto dto, string userId) => new()
+    public static Post ToEntity(CreatePostDto dto, string userId) => new()
     {
         Title = dto.Title.Trim(),
         Content = dto.Content.Trim(),
@@ -66,7 +66,7 @@ public static class EntityMappings
         Date = DateTime.UtcNow
     };
 
-    public static CommentDto ToDto(this Comment comment) => new()
+    public static CommentDto ToDto(Comment comment) => new()
     {
         Id = comment.Id,
         Content = comment.Content,
@@ -77,7 +77,7 @@ public static class EntityMappings
         AuthorPictureUrl = comment.User?.ProfilePictureUrl
     };
 
-    public static Comment ToEntity(this CreateCommentDto dto, string userId) => new()
+    public static Comment ToEntity(CreateCommentDto dto, string userId) => new()
     {
         Content = dto.Content.Trim(),
         PostId = dto.PostId,
@@ -85,7 +85,7 @@ public static class EntityMappings
         Date = DateTime.UtcNow
     };
 
-    public static PrivateMessageDto ToDto(this PrivateMessage message) => new()
+    public static PrivateMessageDto ToDto(PrivateMessage message) => new()
     {
         Id = message.Id,
         Content = message.Content,
@@ -97,7 +97,7 @@ public static class EntityMappings
         ReceiverName = message.Receiver?.UserName ?? ""
     };
 
-    public static PrivateMessage ToEntity(this SendMessageDto dto, string senderUserId, string receiverUserId) => new()
+    public static PrivateMessage ToEntity(SendMessageDto dto, string senderUserId, string receiverUserId) => new()
     {
         Content = dto.Content.Trim(),
         SenderUserId = senderUserId,
@@ -105,7 +105,7 @@ public static class EntityMappings
         Date = DateTime.UtcNow
     };
 
-    public static ReportDto ToDto(this Report report) => new()
+    public static ReportDto ToDto(Report report) => new()
     {
         Id = report.Id,
         Date = report.Date,
@@ -118,7 +118,7 @@ public static class EntityMappings
         TopicUrlName = report.Post?.Topic?.UrlName ?? ""
     };
 
-    public static Report ToEntity(this CreateReportDto dto, string userId) => new()
+    public static Report ToEntity(CreateReportDto dto, string userId) => new()
     {
         Reason = dto.Reason.Trim(),
         PostId = dto.PostId,
@@ -127,19 +127,19 @@ public static class EntityMappings
         Date = DateTime.UtcNow
     };
 
-    public static List<PostDto> ToDtos(this IEnumerable<Post> posts)
-        => posts.Select(post => post.ToDto()).ToList();
+    public static List<PostDto> ToDtos(IEnumerable<Post> posts)
+        => posts.Select(post => ToDto(post)).ToList();
 
-    public static List<CommentDto> ToDtos(this IEnumerable<Comment> comments)
-        => comments.Select(comment => comment.ToDto()).ToList();
+    public static List<CommentDto> ToDtos(IEnumerable<Comment> comments)
+        => comments.Select(comment => ToDto(comment)).ToList();
 
-    public static List<PrivateMessageDto> ToDtos(this IEnumerable<PrivateMessage> messages)
-        => messages.Select(message => message.ToDto()).ToList();
+    public static List<PrivateMessageDto> ToDtos(IEnumerable<PrivateMessage> messages)
+        => messages.Select(message => ToDto(message)).ToList();
 
-    public static List<ReportDto> ToDtos(this IEnumerable<Report> reports)
-        => reports.Select(report => report.ToDto()).ToList();
+    public static List<ReportDto> ToDtos(IEnumerable<Report> reports)
+        => reports.Select(report => ToDto(report)).ToList();
 
-    public static UserDto ToDto(this User user, IEnumerable<string> roles) => new()
+    public static UserDto ToDto(User user, IEnumerable<string> roles) => new()
     {
         Id = user.Id,
         UserName = user.UserName ?? "",
@@ -152,7 +152,7 @@ public static class EntityMappings
     {
         Id = post.Id,
         Title = post.Title,
-        UrlTitle = post.Title.ToCleanUrl(),
+        UrlTitle = UrlFormatter.ToCleanUrl(post.Title),
         Content = post.Content,
         Date = post.Date,
         TopicId = post.TopicId,

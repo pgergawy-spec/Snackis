@@ -3,16 +3,10 @@ using SnackisAPI.Data;
 
 namespace SnackisAPI.Repositories;
 
-public class GenericRepository<T> : IRepository<T> where T : class
+public class GenericRepository<T>(SnackisDbContext context) : IRepository<T> where T : class
 {
-    protected readonly SnackisDbContext _context;
-    protected readonly DbSet<T> _dbSet;
-
-    public GenericRepository(SnackisDbContext context)
-    {
-        _context = context;
-        _dbSet = context.Set<T>();
-    }
+    protected readonly SnackisDbContext _context = context;
+    protected readonly DbSet<T> _dbSet = context.Set<T>();
 
     public async Task<IEnumerable<T>> GetAllAsync()
         => await _dbSet.ToListAsync();

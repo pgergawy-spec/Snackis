@@ -1,0 +1,11 @@
+@model AvatarViewModel
+@inject IOptions<ApiSettings> ApiOptions
+
+@if (!string.IsNullOrEmpty(Model.PictureUrl))
+{
+    <img src="@(ApiOptions.Value.BaseUrl.TrimEnd('/') + Model.PictureUrl)" alt="Profilbild för @Model.UserName" class="avatar avatar-@Model.Size" />
+}
+else
+{
+    <span class="avatar avatar-@Model.Size avatar-placeholder" aria-hidden="true">@Model.Initial</span>
+}

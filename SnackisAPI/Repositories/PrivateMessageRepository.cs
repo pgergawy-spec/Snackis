@@ -4,12 +4,8 @@ using SnackisAPI.Models;
 
 namespace SnackisAPI.Repositories;
 
-public class PrivateMessageRepository : GenericRepository<PrivateMessage>, IPrivateMessageRepository
+public class PrivateMessageRepository(SnackisDbContext context) : GenericRepository<PrivateMessage>(context), IPrivateMessageRepository
 {
-    public PrivateMessageRepository(SnackisDbContext context) : base(context)
-    {
-
-    }
     public async Task<IEnumerable<PrivateMessage>> GetInboxAsync(string userId)
         => await _dbSet.AsNoTracking()
             .Where(message => message.ReceiverUserId == userId)

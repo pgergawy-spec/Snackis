@@ -4,9 +4,9 @@ using System.Text.RegularExpressions;
 
 namespace SnackisAPI.Helpers;
 
-public static class StringExtensions
+public static class UrlFormatter
 {
-    public static string ToCleanUrl(this string text)
+    public static string ToCleanUrl(string text)
     {
         var withoutAccents = new string(text.Trim().ToLowerInvariant()
             .Normalize(NormalizationForm.FormD)

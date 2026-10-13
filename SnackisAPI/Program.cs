@@ -3,13 +3,13 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using SnackisAPI.Data;
 using SnackisAPI.Exceptions;
-using SnackisAPI.Extensions;
 using SnackisAPI.Models;
+using SnackisAPI.Startup;
 namespace SnackisAPI;
 
 public class Program
 {
-    public static void Main(string[] args)
+    public static async Task Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
 
@@ -22,7 +22,10 @@ public class Program
             .AddEntityFrameworkStores<SnackisDbContext>();
 
 
-        builder.Services.AddRepositories().AddServices();
+        ServiceRegistration.AddRepositories(builder.Services);
+        ServiceRegistration.AddServices(builder.Services);
+        ServiceRegistration.AddSeeding(builder.Services, builder.Configuration);
+        ServiceRegistration.AddJwtAuthentication(builder.Services, builder.Configuration);
 
         builder.Services.AddControllers();
         builder.Services.AddExceptionHandler<ExceptionHandler>();
@@ -32,19 +35,26 @@ public class Program
 
         var app = builder.Build();
 
+        await DatabaseStartup.SeedDatabaseAsync(app);
+
 
         if (app.Environment.IsDevelopment())
         {
             app.MapOpenApi();
         }
 
-        app.UseHttpsRedirection();
         app.UseExceptionHandler();
+        app.UseHttpsRedirection();
+        app.UseStaticFiles(new StaticFileOptions
+        {
+            OnPrepareResponse = context => context.Context.Response.Headers.XContentTypeOptions = "nosniff"
+        });
+        app.UseAuthentication();
         app.UseAuthorization();
 
 
         app.MapControllers();
 
-        app.Run();
+        await app.RunAsync();
     }
 }

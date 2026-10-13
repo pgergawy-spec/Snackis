@@ -4,12 +4,8 @@ using SnackisAPI.Models;
 
 namespace SnackisAPI.Data;
 
-public class SnackisDbContext : IdentityDbContext<User>
+public class SnackisDbContext(DbContextOptions<SnackisDbContext> options) : IdentityDbContext<User>(options)
 {
-    public SnackisDbContext(DbContextOptions<SnackisDbContext> options) : base(options)
-    {
-
-    }
     public DbSet<Comment> Comments { get; set; }
     public DbSet<Post> Posts { get; set; }
     public DbSet<PrivateMessage> PrivateMessages { get; set; }

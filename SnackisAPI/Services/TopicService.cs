@@ -8,7 +8,7 @@ namespace SnackisAPI.Services;
 public class TopicService(ITopicRepository topicRepository, ILogger<TopicService> logger) : ITopicService
 {
     public async Task<IEnumerable<TopicDto>> GetTopicOverviewAsync()
-        => (await topicRepository.GetAllAsync()).ToTopicOverview();
+        => EntityMappings.ToTopicOverview(await topicRepository.GetAllAsync());
 
     public async Task<TopicDto> GetByUrlNameAsync(string urlName)
     {
@@ -16,12 +16,12 @@ public class TopicService(ITopicRepository topicRepository, ILogger<TopicService
             ?? throw new NotFoundException("Ämnet finns inte.");
 
         var subTopics = await topicRepository.GetSubTopicsAsync(topic.Id);
-        return topic.ToDto(subTopics);
+        return EntityMappings.ToDto(topic, subTopics);
     }
 
     public async Task<TopicDto> CreateAsync(CreateTopicDto createTopicDto)
     {
-        var topic = createTopicDto.ToEntity();
+        var topic = EntityMappings.ToEntity(createTopicDto);
 
         if (string.IsNullOrEmpty(topic.UrlName))
             throw new BadRequestException("Namnet måste innehålla minst en bokstav eller siffra.");
@@ -34,7 +34,7 @@ public class TopicService(ITopicRepository topicRepository, ILogger<TopicService
         await topicRepository.AddAsync(topic);
         logger.LogInformation("Topic {TopicId} created with url name {UrlName}", topic.Id, topic.UrlName);
 
-        return topic.ToDto();
+        return EntityMappings.ToDto(topic);
     }
 
     private async Task EnsureParentIsMainTopicAsync(Guid? parentId)
