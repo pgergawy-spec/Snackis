@@ -3,8 +3,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using SnackisAPI.Data;
 using SnackisAPI.Exceptions;
-using SnackisAPI.Startup;
 using SnackisAPI.Models;
+using SnackisAPI.Startup;
 namespace SnackisAPI;
 
 public class Program
