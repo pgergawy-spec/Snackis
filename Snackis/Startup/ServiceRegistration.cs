@@ -8,5 +8,7 @@ public static class ServiceRegistration
     {
         services.AddScoped<ITopicApiService, TopicApiService>();
         services.AddScoped<IPostApiService, PostApiService>();
+        services.AddScoped<ICommentApiService, CommentApiService>();
+        services.AddScoped<IAccountApiService, AccountApiService>();
     }
 }

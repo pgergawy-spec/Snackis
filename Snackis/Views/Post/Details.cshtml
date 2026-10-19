@@ -1,0 +1,51 @@
+﻿@model PostPageViewModel
+@{
+    ViewData["Title"] = Model.Post.Title;
+}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Forum</a></li>
+        @if (Model.Post.ParentTopicName is not null)
+        {
+           <li class="breadcrumb-item">
+            <a asp-controller="Topic" asp-action="Details" asp-route-topicUrlName="@Model.Post.ParentTopicUrlName">@Model.Post.ParentTopicName</a>
+           </li>
+        }
+        <li class="breadcrumb-item">
+            <a asp-controller="Topic" asp-action="Details" asp-route-topicUrlName="@Model.Post.TopicUrlName">@Model.Post.TopicName</a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">@Model.Post.Title</li>
+    </ol>
+</nav>
+
+<article class="card">
+    <div class="card-body">
+        <h1 class="h3 card-title">@Model.Post.Title</h1>
+
+        <div class="d-flex gap-3 align-items-center mb-3">
+            <partial name="_Avatar" model="@(new AvatarViewModel { PictureUrl = Model.Post.AuthorPictureUrl, UserName = Model.Post.AuthorName })" />
+            <div>
+                <div class="fw-bold">@Model.Post.AuthorName</div>
+                <div class="text-muted small">@DateFormatter.ToDisplayText(Model.Post.Date)</div>
+            </div>
+        </div>
+
+        <div class="post-content">@Model.Post.Content</div>
+    </div>
+</article>
+
+<h2 class="h4 mt-4 mb-3">Kommentarer (@Model.Comments.Count)</h2>
+@foreach (var comment in Model.Comments)
+{
+    <div class="d-flex gap-3 mb-3">
+        <partial name="_Avatar" model="@(new AvatarViewModel { PictureUrl = comment.AuthorPictureUrl, UserName = comment.AuthorName })" />
+        <div class="flex-grow-1">
+            <div>
+                <span class="fw-bold">@comment.AuthorName</span>
+                <span class="text-muted small">&middot; @DateFormatter.ToDisplayText(comment.Date)</span>
+            </div>
+            <div class="post-content">@comment.Content</div>
+        </div>
+    </div>
+}

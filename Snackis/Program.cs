@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using Snackis.Filters;
 using Snackis.Services;
@@ -30,6 +31,14 @@ public class Program
         });
 
         ServiceRegistration.AddApiServices(builder.Services);
+        builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+            .AddCookie(options =>
+            {
+                options.LoginPath = "/Account/Login";
+                options.AccessDeniedPath = "/Home/Error";
+                options.SlidingExpiration = false;
+            }
+            );
 
         var app = builder.Build();
 
@@ -42,6 +51,7 @@ public class Program
         app.UseHttpsRedirection();
         app.UseStatusCodePagesWithReExecute("/Home/Error", "?statusCode={0}");
         app.UseRouting();
+        app.UseAuthentication();
 
         app.UseAuthorization();
 
