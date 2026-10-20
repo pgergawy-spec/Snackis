@@ -1,0 +1,60 @@
+@model CreateTopicViewModel
+@{
+    ViewData["Title"] = "Administrera ämnen";
+}
+
+<h1 class="h3 mb-4">Administrera ämnen</h1>
+
+<div class="row">
+    <div class="col-12 col-lg-5 mb-4">
+        <div class="card">
+            <div class="card-header fw-bold">Skapa nytt ämne</div>
+            <div class="card-body">
+                <form asp-controller="Admin" asp-action="Topics" method="post">
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                    <div class="mb-3">
+                        <label asp-for="Name" class="form-label"></label>
+                        <input asp-for="Name" class="form-control" />
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="ParentId" class="form-label"></label>
+                        <select asp-for="ParentId" class="form-select"
+                                asp-items="@(new SelectList(Model.MainTopics, nameof(TopicViewModel.Id), nameof(TopicViewModel.Name)))">
+                            <option value="">Ny huvudrubrik</option>
+                        </select>
+                        <div class="form-text">Välj en rubrik för att skapa ett underämne, till exempel Bilsnack under Fordonssnack.</div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Skapa ämne</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12 col-lg-7">
+        <h2 class="h5">Befintliga ämnen</h2>
+        @foreach (var mainTopic in Model.MainTopics)
+        {
+            <div class="card mb-3">
+                <div class="card-header fw-bold">@mainTopic.Name</div>
+                <ul class="list-group list-group-flush">
+                    @foreach (var subTopic in mainTopic.SubTopics)
+                    {
+                        <li class="list-group-item">@subTopic.Name</li>
+                    }
+                    @if (mainTopic.SubTopics.Count == 0)
+                    {
+                        <li class="list-group-item text-muted">Inga underämnen</li>
+                    }
+                </ul>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

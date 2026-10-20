@@ -7,8 +7,23 @@ namespace Snackis.Controllers;
 
 public class HomeController(ITopicApiService topicApiService) : SnackisControllerBase
 {
+    public const string CookieNoticeName = "Snackis.CookieNotice";
+
     public async Task<IActionResult> Index()
         => View(await topicApiService.GetAllTopicsAsync());
+
+    [HttpPost]
+    public IActionResult AcceptCookies(string? returnUrl)
+    {
+        Response.Cookies.Append(CookieNoticeName, "accepted", new CookieOptions
+        {
+            Expires = DateTimeOffset.UtcNow.AddYears(1),
+            IsEssential = true,
+            SameSite = SameSiteMode.Lax
+        });
+
+        return RedirectToLocal(returnUrl);
+    }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error(int? statusCode)

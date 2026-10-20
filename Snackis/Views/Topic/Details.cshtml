@@ -16,7 +16,20 @@
     </ol>
 </nav>
 
-<h1 class="h2 mb-3">@Model.Topic.Name</h1>
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+    <h1 class="h2 mb-0">@Model.Topic.Name</h1>
+    @if (Model.Topic.ParentId is not null)
+    {
+        @if (User.Identity?.IsAuthenticated == true)
+        {
+            <a class="btn btn-primary" asp-controller="Post" asp-action="Create" asp-route-topicUrlName="@Model.Topic.UrlName">Skriv nytt inlägg</a>
+        }
+        else
+        {
+            <a class="btn btn-outline-primary" asp-controller="Account" asp-action="Login" asp-route-returnUrl="@Context.Request.Path">Logga in för att skriva</a>
+        }
+    }
+</div>
 
 @if (Model.Topic.SubTopics.Count > 0)
 {
@@ -29,25 +42,31 @@
     </div>
 }
 
-<h2 class="h5 mt-4">Inlägg</h2>
+@if (Model.Topic.ParentId is not null)
+{
+    <h2 class="h5 mt-4">Inlägg</h2>
 
-@if (Model.Posts.Count == 0)
-{
-    <div class="alert alert-info">Det finns inga inlägg här ännu. Bli först med att skriva något!</div>
-}
-else
-{
-    <div class="list-group">
-        @foreach (var post in Model.Posts)
-        {
-            <div class="list-group-item d-flex gap-3 align-items-start">
-                <partial name="_Avatar" model="@(new AvatarViewModel { PictureUrl = post.AuthorPictureUrl, UserName = post.AuthorName })" />
-                <div class="flex-grow-1">
-                    <div class="fw-bold">@post.Title</div>
-                    <div class="text-muted small mb-1">av @post.AuthorName &middot; @DateFormatter.ToDisplayText(post.Date)</div>
-                    <div>@TextFormatter.Shorten(post.Content, 150)</div>
+    @if (Model.Posts.Count == 0)
+    {
+        <div class="alert alert-info">Det finns inga inlägg här ännu. Bli först med att skriva något!</div>
+    }
+    else
+    {
+        <div class="list-group">
+            @foreach (var post in Model.Posts)
+            {
+                <div class="list-group-item d-flex gap-3 align-items-start">
+                    <partial name="_Avatar" model="@(new AvatarViewModel { PictureUrl = post.AuthorPictureUrl, UserName = post.AuthorName })" />
+                    <div class="flex-grow-1">
+                        <div class="fw-bold">
+                            <a class="text-decoration-none" asp-controller="Post" asp-action="Details"
+                               asp-route-topicUrlName="@Model.Topic.UrlName" asp-route-postId="@post.Id" asp-route-urlTitle="@post.UrlTitle">@post.Title</a>
+                        </div>
+                        <div class="text-muted small mb-1">av @post.AuthorName &middot; @DateFormatter.ToDisplayText(post.Date)</div>
+                        <div>@TextFormatter.Shorten(post.Content, 150)</div>
+                    </div>
                 </div>
-            </div>
-        }
-    </div>
-}
+            }
+        </div>
+    }
+}

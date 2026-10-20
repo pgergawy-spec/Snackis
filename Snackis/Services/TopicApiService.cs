@@ -10,4 +10,7 @@ public class TopicApiService(IHttpClientFactory httpClientFactory, ILogger<Topic
 
     public Task<TopicViewModel> GetTopicAsync(string urlName)
         => GetAsync<TopicViewModel>($"api/topics/{Uri.EscapeDataString(urlName)}");
+
+    public Task<TopicViewModel> CreateTopicAsync(CreateTopicViewModel createTopicViewModel)
+        => PostAsync<TopicViewModel>("api/topics", new { createTopicViewModel.Name, createTopicViewModel.ParentId });
 }

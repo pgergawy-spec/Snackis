@@ -1,0 +1,12 @@
+@using Snackis.Controllers
+
+@if (Context.Request.Cookies[HomeController.CookieNoticeName] is null)
+{
+    <div class="cookie-notice shadow" role="region" aria-label="Information om cookies">
+        <span>Snackis använder cookies för att hålla dig inloggad och skydda formulär. Genom att fortsätta godkänner du det.</span>
+        <form asp-controller="Home" asp-action="AcceptCookies" method="post" class="d-inline">
+            <input type="hidden" name="returnUrl" value="@(Context.Request.Path + Context.Request.QueryString)" />
+            <button type="submit" class="btn btn-sm btn-light ms-2">Okej</button>
+        </form>
+    </div>
+}
