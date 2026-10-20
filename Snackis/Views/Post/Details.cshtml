@@ -1,16 +1,17 @@
-﻿@model PostPageViewModel
+@model PostPageViewModel
 @{
     ViewData["Title"] = Model.Post.Title;
+    var isSignedIn = User.Identity?.IsAuthenticated == true;
 }
 
 <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Forum</a></li>
-        @if (Model.Post.ParentTopicName is not null)
+        @if (Model.Post.ParentTopicUrlName is not null)
         {
-           <li class="breadcrumb-item">
-            <a asp-controller="Topic" asp-action="Details" asp-route-topicUrlName="@Model.Post.ParentTopicUrlName">@Model.Post.ParentTopicName</a>
-           </li>
+            <li class="breadcrumb-item">
+                <a asp-controller="Topic" asp-action="Details" asp-route-topicUrlName="@Model.Post.ParentTopicUrlName">@Model.Post.ParentTopicName</a>
+            </li>
         }
         <li class="breadcrumb-item">
             <a asp-controller="Topic" asp-action="Details" asp-route-topicUrlName="@Model.Post.TopicUrlName">@Model.Post.TopicName</a>
@@ -19,7 +20,7 @@
     </ol>
 </nav>
 
-<article class="card">
+<article class="card mb-4">
     <div class="card-body">
         <h1 class="h3 card-title">@Model.Post.Title</h1>
 
@@ -33,19 +34,73 @@
 
         <div class="post-content">@Model.Post.Content</div>
     </div>
+
+    @if (isSignedIn)
+    {
+        <div class="card-footer d-flex flex-wrap gap-2">
+            @if (Model.Post.AuthorId != Model.CurrentUserId)
+            {
+                <a class="btn btn-sm btn-outline-secondary" asp-controller="Message" asp-action="Create" asp-route-to="@Model.Post.AuthorName">Skicka meddelande till @Model.Post.AuthorName</a>
+            }
+            <a class="btn btn-sm btn-outline-warning" asp-controller="Report" asp-action="Create" asp-route-postId="@Model.Post.Id">Anmäl inlägget</a>
+            @if (Model.CanDelete(Model.Post.AuthorId))
+            {
+                <form asp-controller="Post" asp-action="Delete" asp-route-topicUrlName="@Model.Post.TopicUrlName" asp-route-postId="@Model.Post.Id"
+                      method="post" onsubmit="return confirm('Vill du ta bort inlägget och alla dess kommentarer?');">
+                    <button type="submit" class="btn btn-sm btn-outline-danger">Ta bort inlägget</button>
+                </form>
+            }
+        </div>
+    }
 </article>
 
-<h2 class="h4 mt-4 mb-3">Kommentarer (@Model.Comments.Count)</h2>
+<h2 class="h4 mb-3">Kommentarer (@Model.Comments.Count)</h2>
+
+@if (Model.Comments.Count == 0)
+{
+    <p class="text-muted">Inga kommentarer ännu.</p>
+}
+
 @foreach (var comment in Model.Comments)
 {
-    <div class="d-flex gap-3 mb-3">
+    <div class="d-flex gap-3 mb-3" id="kommentar-@comment.Id">
         <partial name="_Avatar" model="@(new AvatarViewModel { PictureUrl = comment.AuthorPictureUrl, UserName = comment.AuthorName })" />
         <div class="flex-grow-1">
-            <div>
-                <span class="fw-bold">@comment.AuthorName</span>
-                <span class="text-muted small">&middot; @DateFormatter.ToDisplayText(comment.Date)</span>
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <span class="fw-bold">@comment.AuthorName</span>
+                    <span class="text-muted small">&middot; @DateFormatter.ToDisplayText(comment.Date)</span>
+                </div>
+                @if (Model.CanDelete(comment.AuthorId))
+                {
+                    <form asp-controller="Comment" asp-action="Delete" asp-route-commentId="@comment.Id" method="post"
+                          onsubmit="return confirm('Vill du ta bort kommentaren?');">
+                        <input type="hidden" name="postId" value="@Model.Post.Id" />
+                        <input type="hidden" name="topicUrlName" value="@Model.Post.TopicUrlName" />
+                        <input type="hidden" name="urlTitle" value="@Model.Post.UrlTitle" />
+                        <button type="submit" class="btn btn-sm btn-outline-danger">Ta bort</button>
+                    </form>
+                }
             </div>
             <div class="post-content">@comment.Content</div>
         </div>
     </div>
+}
+
+<div class="mt-4">
+    @if (isSignedIn)
+    {
+        <partial name="_CommentForm" model="Model.NewComment" />
+    }
+    else
+    {
+        <div class="alert alert-info">
+            <a asp-controller="Account" asp-action="Login" asp-route-returnUrl="@Context.Request.Path">Logga in</a>
+            eller <a asp-controller="Account" asp-action="Register">skapa ett konto</a> för att kommentera.
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
 }

@@ -16,7 +16,20 @@
     </ol>
 </nav>
 
-<h1 class="h2 mb-3">@Model.Topic.Name</h1>
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+    <h1 class="h2 mb-0">@Model.Topic.Name</h1>
+    @if (Model.Topic.ParentId is not null)
+    {
+        @if (User.Identity?.IsAuthenticated == true)
+        {
+            <a class="btn btn-primary" asp-controller="Post" asp-action="Create" asp-route-topicUrlName="@Model.Topic.UrlName">Skriv nytt inlägg</a>
+        }
+        else
+        {
+            <a class="btn btn-outline-primary" asp-controller="Account" asp-action="Login" asp-route-returnUrl="@Context.Request.Path">Logga in för att skriva</a>
+        }
+    }
+</div>
 
 @if (Model.Topic.SubTopics.Count > 0)
 {
@@ -56,4 +69,4 @@
             }
         </div>
     }
-}
+}

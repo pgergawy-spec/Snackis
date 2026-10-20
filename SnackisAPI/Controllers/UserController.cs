@@ -14,8 +14,8 @@ public class UserController(IAuthService authService, IProfilePictureService pro
     public async Task<ActionResult<UserDto>> GetCurrentUser()
         => Ok(await authService.GetUserAsync(CurrentUserId));
 
-    [HttpPut("profile-picture")]
-    [RequestSizeLimit(6_000_000)]
-    public async Task<ActionResult<UserDto>> UploadProfilePicture(IFormFile profilePicture)
+    [HttpPut("profile-picture")] // PUT /api/users/me/profile-picture: byter bild för den inloggade.
+    [RequestSizeLimit(6_000_000)] // Nekar uppladdningar över 6 MB redan innan filen läses.
+    public async Task<ActionResult<UserDto>> UploadProfilePicture(IFormFile profilePicture) // Filen kommer som formulärdata (multipart).
         => Ok(await profilePictureService.UploadAsync(CurrentUserId, profilePicture));
 }

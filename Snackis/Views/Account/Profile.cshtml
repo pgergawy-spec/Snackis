@@ -1,0 +1,39 @@
+@model UserViewModel
+@{
+    ViewData["Title"] = "Min profil";
+}
+
+<div class="row justify-content-center">
+    <div class="col-12 col-lg-7">
+        <h1 class="h3 mb-4">Min profil</h1>
+
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex gap-4 align-items-center flex-wrap">
+                    <partial name="_Avatar" model="@(new AvatarViewModel { PictureUrl = Model.ProfilePictureUrl, UserName = Model.UserName, Size = "lg" })" />
+                    <div>
+                        <h2 class="h4 mb-1">@Model.UserName</h2>
+                        <div class="text-muted">@Model.Email</div>
+                        <div class="mt-2">
+                            @foreach (var roleName in Model.Roles)
+                            {
+                                <span class="badge text-bg-secondary me-1">@roleName</span>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <hr />
+
+                <h3 class="h5">Byt profilbild</h3>
+                <form asp-controller="Account" asp-action="UploadProfilePicture" method="post" enctype="multipart/form-data">
+                    <div class="mb-2">
+                        <input type="file" name="profilePicture" class="form-control" accept="image/png,image/jpeg,image/gif,image/webp" required />
+                        <div class="form-text">JPG, PNG, GIF eller WebP, högst 2 MB. Bilden visas bredvid dina inlägg.</div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Ladda upp</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

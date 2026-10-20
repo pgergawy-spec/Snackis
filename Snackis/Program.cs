@@ -23,22 +23,25 @@ public class Program
             ?? throw new Exception("Api:BaseUrl saknas i konfigurationen");
 
         builder.Services.Configure<ApiSettings>(builder.Configuration.GetSection(ApiSettings.SectionName));
+        builder.Services.AddHttpContextAccessor();
+        builder.Services.AddTransient<BearerTokenHandler>();
 
         builder.Services.AddHttpClient(ApiServiceBase.HttpClientName, client =>
         {
             client.BaseAddress = new Uri(apiBaseUrl);
             client.Timeout = TimeSpan.FromSeconds(15);
-        });
+        }).AddHttpMessageHandler<BearerTokenHandler>();
 
         ServiceRegistration.AddApiServices(builder.Services);
+
         builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
             .AddCookie(options =>
             {
                 options.LoginPath = "/Account/Login";
-                options.AccessDeniedPath = "/Home/Error";
+                options.AccessDeniedPath = "/Account/AccessDenied";
+                options.Cookie.Name = "Snackis.Auth";
                 options.SlidingExpiration = false;
-            }
-            );
+            });
 
         var app = builder.Build();
 
@@ -51,8 +54,8 @@ public class Program
         app.UseHttpsRedirection();
         app.UseStatusCodePagesWithReExecute("/Home/Error", "?statusCode={0}");
         app.UseRouting();
-        app.UseAuthentication();
 
+        app.UseAuthentication();
         app.UseAuthorization();
 
         app.MapStaticAssets();

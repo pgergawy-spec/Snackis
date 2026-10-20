@@ -1,8 +1,11 @@
-﻿using Snackis.Models;
+using Snackis.Models;
 
 namespace Snackis.Services;
 
 public interface IAccountApiService
 {
-    public Task<AuthResultViewModel> LoginAsync(LoginViewModel loginViewModel);
+    Task<AuthResultViewModel> LoginAsync(LoginViewModel loginViewModel);
+    Task<UserViewModel> RegisterAsync(RegisterViewModel registerViewModel);
+    Task<UserViewModel> GetCurrentUserAsync();
+    Task<UserViewModel> UploadProfilePictureAsync(IFormFile profilePicture);
 }

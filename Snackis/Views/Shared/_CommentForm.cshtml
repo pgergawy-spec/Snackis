@@ -1,0 +1,14 @@
+@model CreateCommentViewModel
+
+<form asp-controller="Comment" asp-action="Create" method="post">
+    <input type="hidden" asp-for="PostId" />
+    <input type="hidden" asp-for="TopicUrlName" />
+    <input type="hidden" asp-for="UrlTitle" />
+
+    <div class="mb-2">
+        <label asp-for="Content" class="form-label"></label>
+        <textarea asp-for="Content" class="form-control" rows="3"></textarea>
+        <span asp-validation-for="Content" class="text-danger"></span>
+    </div>
+    <button type="submit" class="btn btn-primary">Kommentera</button>
+</form>

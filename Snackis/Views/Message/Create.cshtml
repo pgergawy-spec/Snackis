@@ -1,0 +1,33 @@
+@model SendMessageViewModel
+@{
+    ViewData["Title"] = "Nytt meddelande";
+}
+
+<div class="row justify-content-center">
+    <div class="col-12 col-lg-8">
+        <h1 class="h3 mb-3">Nytt meddelande</h1>
+
+        <form asp-controller="Message" asp-action="Create" method="post">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+            <div class="mb-3">
+                <label asp-for="ReceiverUserName" class="form-label"></label>
+                <input asp-for="ReceiverUserName" class="form-control" />
+                <span asp-validation-for="ReceiverUserName" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Content" class="form-label"></label>
+                <textarea asp-for="Content" class="form-control" rows="6"></textarea>
+                <span asp-validation-for="Content" class="text-danger"></span>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Skicka</button>
+            <a class="btn btn-link" asp-controller="Message" asp-action="Inbox">Avbryt</a>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -23,20 +23,24 @@
                         <li class="nav-item">
                             <a class="nav-link" asp-controller="Home" asp-action="Index">Forum</a>
                         </li>
-                    </ul>
-                    <div class="d-flex align-items-center gap-3">
                         @if (User.Identity?.IsAuthenticated == true)
                         {
-                            <span class="navbar-text">@User.Identity.Name</span>
-                            <form method="post" asp-controller="Account" asp-action="Logout">
-                                <button type="submit" class="btn btn-outline-light btn-sm">Logga ut</button>
-                            </form>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Message" asp-action="Inbox">Meddelanden</a>
+                            </li>
                         }
-                        else
+                        @if (User.IsInRole("Admin"))
                         {
-                            <a class="btn btn-outline-light btn-sm" asp-controller="Account" asp-action="Login">Logga in</a>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Admin</a>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" asp-controller="Admin" asp-action="Topics">Ämnen</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Admin" asp-action="Reports">Anmälningar</a></li>
+                                </ul>
+                            </li>
                         }
-                    </div>
+                    </ul>
+                    <partial name="_LoginPartial" />
                 </div>
             </div>
         </nav>
@@ -44,6 +48,7 @@
 
     <div class="container flex-grow-1">
         <main role="main" class="pb-4">
+            <partial name="_Flash" />
             @RenderBody()
         </main>
     </div>
@@ -53,6 +58,8 @@
             &copy; 2026 Snackis &ndash; ett forum för alla ämnen
         </div>
     </footer>
+
+    <partial name="_CookieNotice" />
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
