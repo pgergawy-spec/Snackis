@@ -94,7 +94,8 @@ public static class EntityMappings
         SenderName = message.Sender?.UserName ?? "",
         SenderPictureUrl = message.Sender?.ProfilePictureUrl,
         ReceiverId = message.ReceiverUserId,
-        ReceiverName = message.Receiver?.UserName ?? ""
+        ReceiverName = message.Receiver?.UserName ?? "",
+        ReceiverPictureUrl = message.Receiver?.ProfilePictureUrl
     };
 
     public static PrivateMessage ToEntity(SendMessageDto dto, string senderUserId, string receiverUserId) => new()

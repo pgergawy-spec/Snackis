@@ -26,7 +26,7 @@
 @foreach (var message in Model.Messages)
 {
     var otherUserName = Model.ShowSender ? message.SenderName : message.ReceiverName;
-    var otherPictureUrl = Model.ShowSender ? message.SenderPictureUrl : null;
+    var otherPictureUrl = Model.ShowSender ? message.SenderPictureUrl : message.ReceiverPictureUrl;
 
     <div class="card mb-3">
         <div class="card-body d-flex gap-3">

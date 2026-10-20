@@ -10,4 +10,5 @@ public class PrivateMessageDto
     public string? SenderPictureUrl { get; set; }
     public string ReceiverId { get; set; } = "";
     public string ReceiverName { get; set; } = "";
+    public string? ReceiverPictureUrl { get; set; }
 }
