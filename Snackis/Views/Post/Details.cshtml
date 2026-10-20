@@ -41,8 +41,8 @@
             @if (Model.Post.AuthorId != Model.CurrentUserId)
             {
                 <a class="btn btn-sm btn-outline-secondary" asp-controller="Message" asp-action="Create" asp-route-to="@Model.Post.AuthorName">Skicka meddelande till @Model.Post.AuthorName</a>
+                <a class="btn btn-sm btn-outline-warning" asp-controller="Report" asp-action="Create" asp-route-postId="@Model.Post.Id">Anmäl inlägget</a>
             }
-            <a class="btn btn-sm btn-outline-warning" asp-controller="Report" asp-action="Create" asp-route-postId="@Model.Post.Id">Anmäl inlägget</a>
             @if (Model.CanDelete(Model.Post.AuthorId))
             {
                 <form asp-controller="Post" asp-action="Delete" asp-route-topicUrlName="@Model.Post.TopicUrlName" asp-route-postId="@Model.Post.Id"

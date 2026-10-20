@@ -9,7 +9,10 @@ public class ReportService(IReportRepository reportRepository, IPostRepository p
 {
     public async Task<ReportDto> CreateAsync(CreateReportDto createReportDto, string userId)
     {
-        await PostRepositoryChecks.EnsureExistsAsync(postRepository, createReportDto.PostId);
+        var post = await PostRepositoryChecks.EnsureExistsAsync(postRepository, createReportDto.PostId);
+
+        if (post.UserId == userId)
+            throw new BadRequestException("Du kan inte anmäla ditt eget inlägg.");
 
         if (await reportRepository.HasUserReportedPostAsync(createReportDto.PostId, userId))
             throw new ConflictException("Du har redan anmält det här inlägget.");
