@@ -1,16 +1,16 @@
-using System.Security.Claims;
-using System.Text;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using SnackisAPI.Dtos;
 using SnackisAPI.Settings;
+using System.Security.Claims;
+using System.Text;
 
 namespace SnackisAPI.Services;
 
-public class TokenService(IOptions<JwtSettings> jwtOptions) : ITokenService // Skapar JWT-token (inloggningsbeviset) som användaren får vid inloggning.
+public class TokenService(IOptions<JwtSettings> jwtOptions) : ITokenService // IOptions = låda med inställningarna från appsettings, som injiceras (DI)
 {
-    public AuthResultDto CreateToken(UserDto user) // Tar emot användaren och returnerar token, när den går ut och användaren.
+    public AuthResultDto CreateToken(UserDto user)
     {
         var jwtSettings = jwtOptions.Value; // Inställningarna (Issuer, Audience, Key, tid) kommer från appsettings och user secrets.
         var expiresAt = DateTime.UtcNow.AddMinutes(jwtSettings.ExpiresInMinutes); // Token slutar gälla efter ExpiresInMinutes (60 min).

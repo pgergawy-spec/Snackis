@@ -1,4 +1,3 @@
-using System.Net;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
@@ -7,6 +6,7 @@ using Snackis.Exceptions;
 using Snackis.Helpers;
 using Snackis.Models;
 using Snackis.Services;
+using System.Net;
 
 namespace Snackis.Controllers;
 
@@ -86,15 +86,15 @@ public class AccountController(IAccountApiService accountApiService, ILogger<Acc
 
     [Authorize]
     [HttpGet]
-    public async Task<IActionResult> Profile() // Visar profilsidan med nuvarande bild.
+    public async Task<IActionResult> Profile()
         => View(await accountApiService.GetCurrentUserAsync());
 
     [Authorize]
     [HttpPost]
-    [RequestSizeLimit(6_000_000)] // Nekar uppladdningar över 6 MB redan innan filen läses.
+    [RequestSizeLimit(6_000_000)]
     public async Task<IActionResult> UploadProfilePicture(IFormFile? profilePicture) // IFormFile = filen som användaren valde i formuläret.
     {
-        if (profilePicture is null || profilePicture.Length == 0) // Ingen fil vald eller tom fil.
+        if (profilePicture is null || profilePicture.Length == 0)
         {
             ShowError("Välj en bild att ladda upp.");
             return RedirectToAction(nameof(Profile));
@@ -102,7 +102,7 @@ public class AccountController(IAccountApiService accountApiService, ILogger<Acc
 
         try
         {
-            await accountApiService.UploadProfilePictureAsync(profilePicture); // Skickar bilden vidare till API:t, som kontrollerar och sparar den.
+            await accountApiService.UploadProfilePictureAsync(profilePicture);
             logger.LogInformation("User {UserId} uploaded a new profile picture", CurrentUserId);
             ShowSuccess("Din profilbild är uppdaterad.");
         }
@@ -125,7 +125,7 @@ public class AccountController(IAccountApiService accountApiService, ILogger<Acc
             ExpiresUtc = DateTime.SpecifyKind(authResult.ExpiresAt, DateTimeKind.Utc)
         };
         properties.StoreTokens([new AuthenticationToken { Name = BearerTokenHandler.AccessTokenName, Value = authResult.Token }]);
-
+        //Sparar jwt i cookie med StoreTokens
         await HttpContext.SignInAsync(
             CookieAuthenticationDefaults.AuthenticationScheme,
             UserPrincipalFactory.Create(authResult.User),

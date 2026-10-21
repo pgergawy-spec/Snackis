@@ -1,10 +1,10 @@
-using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using SnackisAPI.Repositories;
 using SnackisAPI.Seeding;
 using SnackisAPI.Services;
 using SnackisAPI.Settings;
+using System.Text;
 
 namespace SnackisAPI.Startup;
 
@@ -40,6 +40,10 @@ public static class ServiceRegistration
     }
 
     public static void AddJwtAuthentication(IServiceCollection services, IConfiguration configuration)
+    // services = DI-containern där JWT-autentiseringen registreras.
+    // configuration = inställningarna (appsettings, user secrets, Azure).
+    // Metoden behöver JWT-nyckeln för att kunna kontrollera att en token är äkta (signaturen).
+    // så metoden kan läsa JWT-nyckeln och reglerna vid start.
     {
         var jwtSection = configuration.GetSection(JwtSettings.SectionName);
         services.Configure<JwtSettings>(jwtSection);
@@ -51,14 +55,14 @@ public static class ServiceRegistration
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(options => options.TokenValidationParameters = new TokenValidationParameters
             {
-                ValidateIssuer = true,
-                ValidIssuer = jwtSettings.Issuer,
+                ValidateIssuer = true,// Kontrollera vem som skapade token
+                ValidIssuer = jwtSettings.Issuer,// Måste vara vårt API
                 ValidateAudience = true,
                 ValidAudience = jwtSettings.Audience,
                 ValidateLifetime = true,
                 ValidateIssuerSigningKey = true,
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Key)),
-                ClockSkew = TimeSpan.FromSeconds(30)
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Key)),// Gör nyckeltexten till bytes och packar den som en symmetrisk nyckel (samma nyckel signerar och kontrollerar)
+                ClockSkew = TimeSpan.FromSeconds(30)// Marginal för små klockskillnader. Utan raden gäller 5 min, valde 30 sek.
             });
 
         services.AddAuthorization();
